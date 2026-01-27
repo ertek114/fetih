@@ -1,0 +1,1484 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Panel | FETiH SAAT</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Oswald:wght@400;500;600;700&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        :root {
+            --bg: #FAF9F7;
+            --card: #ffffff;
+            --text: #1a1a1a;
+            --muted: #6b6b6b;
+            --border: #E8E5E0;
+            --accent: #8B7355;
+            --accent-dark: #6d5a44;
+            --success: #28a745;
+            --error: #dc3545;
+            --warning: #ffc107;
+            --info: #17a2b8;
+        }
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            line-height: 1.6;
+        }
+        h1, h2, h3 {
+            font-family: 'Oswald', sans-serif;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .login-container {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 2rem;
+        }
+        .login-box {
+            background: var(--card);
+            padding: 2.5rem;
+            border-radius: 16px;
+            box-shadow: 0 4px 20px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+        .login-box h1 {
+            font-size: 1.75rem;
+            color: var(--accent);
+            margin-bottom: 0.5rem;
+        }
+        .login-box p {
+            color: var(--muted);
+            margin-bottom: 2rem;
+            font-size: 0.9rem;
+        }
+        .admin-panel {
+            display: none;
+            min-height: 100vh;
+        }
+        .admin-panel.active {
+            display: block;
+        }
+        .top-bar {
+            background: var(--card);
+            padding: 1rem 2rem;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid var(--border);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .top-bar h1 {
+            font-size: 1.25rem;
+            color: var(--accent);
+        }
+        .container {
+            max-width: 1400px;
+            margin: 0 auto;
+            padding: 2rem;
+        }
+        .tabs {
+            display: flex;
+            gap: 0.5rem;
+            margin-bottom: 2rem;
+            border-bottom: 2px solid var(--border);
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .tab {
+            padding: 1rem 1.5rem;
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            background: transparent;
+            border: none;
+            color: var(--muted);
+            cursor: pointer;
+            border-bottom: 3px solid transparent;
+            transition: all 0.2s;
+            white-space: nowrap;
+        }
+        .tab:hover {
+            color: var(--text);
+        }
+        .tab.active {
+            color: var(--accent);
+            border-bottom-color: var(--accent);
+        }
+        .tab-content {
+            display: none;
+        }
+        .tab-content.active {
+            display: block;
+        }
+        .section {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            margin-bottom: 1.5rem;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+        }
+        .section h2 {
+            font-size: 1.125rem;
+            color: var(--accent);
+            margin-bottom: 1rem;
+            padding-bottom: 0.75rem;
+            border-bottom: 1px solid var(--border);
+        }
+        input, textarea, select {
+            width: 100%;
+            padding: 0.875rem;
+            margin-bottom: 1rem;
+            border: 1.5px solid var(--border);
+            border-radius: 10px;
+            font-family: inherit;
+            font-size: 0.95rem;
+            background: var(--bg);
+            color: var(--text);
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        input:focus, textarea:focus, select:focus {
+            border-color: var(--accent);
+        }
+        label {
+            display: block;
+            font-size: 0.8rem;
+            font-weight: 600;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .form-row {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 1rem;
+        }
+        .form-row-3 {
+            display: grid;
+            grid-template-columns: 1fr 1fr 1fr;
+            gap: 1rem;
+        }
+        button {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.9rem;
+            font-weight: 500;
+            padding: 0.875rem 1.5rem;
+            border: none;
+            border-radius: 10px;
+            cursor: pointer;
+            transition: all 0.2s;
+            text-transform: uppercase;
+            letter-spacing: 0.03em;
+        }
+        .btn-primary {
+            background: var(--accent);
+            color: #fff;
+        }
+        .btn-primary:hover {
+            background: var(--accent-dark);
+        }
+        .btn-secondary {
+            background: var(--bg);
+            color: var(--text);
+            border: 1.5px solid var(--border);
+        }
+        .btn-secondary:hover {
+            background: var(--border);
+        }
+        .btn-danger {
+            background: var(--error);
+            color: #fff;
+        }
+        .btn-danger:hover {
+            background: #c82333;
+        }
+        .btn-success {
+            background: var(--success);
+            color: #fff;
+        }
+        .btn-success:hover {
+            background: #218838;
+        }
+        .btn-sm {
+            padding: 0.5rem 1rem;
+            font-size: 0.8rem;
+        }
+        .grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1rem;
+        }
+        .card {
+            background: var(--bg);
+            padding: 1.25rem;
+            border-radius: 10px;
+            border: 1px solid var(--border);
+        }
+        .card h3 {
+            font-size: 1rem;
+            margin-bottom: 0.5rem;
+            color: var(--text);
+        }
+        .card p {
+            font-size: 0.85rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+        }
+        .card .price {
+            font-family: 'Oswald', sans-serif;
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: var(--accent);
+            margin: 0.5rem 0;
+        }
+        .card .actions {
+            display: flex;
+            gap: 0.5rem;
+            margin-top: 1rem;
+            padding-top: 1rem;
+            border-top: 1px solid var(--border);
+        }
+        .card .actions button {
+            flex: 1;
+        }
+        .card-id {
+            font-size: 0.7rem;
+            color: var(--muted);
+            font-family: monospace;
+            background: var(--card);
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            display: inline-block;
+            margin-top: 0.5rem;
+        }
+        .card-image {
+            width: 100%;
+            height: 150px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+            background: var(--border);
+        }
+        table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        th, td {
+            padding: 1rem;
+            text-align: left;
+            border-bottom: 1px solid var(--border);
+        }
+        th {
+            background: var(--bg);
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.8rem;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            color: var(--muted);
+        }
+        .status {
+            display: inline-block;
+            padding: 0.25rem 0.75rem;
+            border-radius: 100px;
+            font-size: 0.7rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+        .status.pending { background: #fff3cd; color: #856404; }
+        .status.payment_started { background: #cce5ff; color: #004085; }
+        .status.paid { background: #d4edda; color: #155724; }
+        .status.failed { background: #f8d7da; color: #721c24; }
+        .status.shipped { background: #d1ecf1; color: #0c5460; }
+        .status.eft_pending { background: #e2e3e5; color: #383d41; }
+        .message {
+            padding: 1rem;
+            border-radius: 10px;
+            margin-bottom: 1rem;
+            font-size: 0.9rem;
+        }
+        .message.success { background: #d4edda; color: #155724; }
+        .message.error { background: #f8d7da; color: #721c24; }
+        .message.info { background: #e3f2fd; color: #1565c0; }
+        .message.warning { background: #fff3cd; color: #856404; }
+        .empty-state {
+            text-align: center;
+            padding: 3rem;
+            color: var(--muted);
+        }
+        .empty-state svg {
+            width: 48px;
+            height: 48px;
+            stroke: var(--border);
+            margin-bottom: 1rem;
+        }
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 1rem;
+            margin-bottom: 2rem;
+        }
+        .stat-card {
+            background: var(--card);
+            padding: 1.5rem;
+            border-radius: 12px;
+            text-align: center;
+            border: 1px solid var(--border);
+        }
+        .stat-card .value {
+            font-family: 'Oswald', sans-serif;
+            font-size: 2rem;
+            font-weight: 600;
+            color: var(--accent);
+        }
+        .stat-card .label {
+            font-size: 0.8rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+            margin-top: 0.25rem;
+        }
+        .table-responsive {
+            overflow-x: auto;
+            -webkit-overflow-scrolling: touch;
+        }
+        .order-card {
+            background: var(--card);
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            margin-bottom: 1rem;
+            overflow: hidden;
+        }
+        .order-header {
+            padding: 1rem;
+            background: var(--bg);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            flex-wrap: wrap;
+            gap: 0.5rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .order-id {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+        }
+        .order-date {
+            font-size: 0.8rem;
+            color: var(--muted);
+        }
+        .order-body {
+            padding: 1rem;
+        }
+        .order-customer {
+            margin-bottom: 1rem;
+            padding-bottom: 1rem;
+            border-bottom: 1px solid var(--border);
+        }
+        .order-customer h4 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .customer-info {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 0.5rem;
+        }
+        .customer-info-item {
+            font-size: 0.85rem;
+        }
+        .customer-info-item strong {
+            color: var(--text);
+        }
+        .order-items {
+            margin-bottom: 1rem;
+        }
+        .order-items h4 {
+            font-family: 'Oswald', sans-serif;
+            font-size: 0.8rem;
+            color: var(--muted);
+            margin-bottom: 0.5rem;
+            text-transform: uppercase;
+            letter-spacing: 0.05em;
+        }
+        .order-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 0.5rem 0;
+            border-bottom: 1px solid var(--border);
+            font-size: 0.85rem;
+        }
+        .order-item:last-child {
+            border-bottom: none;
+        }
+        .order-summary {
+            background: var(--bg);
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1rem;
+        }
+        .order-summary-row {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 0.5rem;
+            font-size: 0.9rem;
+        }
+        .order-summary-row.total {
+            font-family: 'Oswald', sans-serif;
+            font-weight: 600;
+            font-size: 1.1rem;
+            padding-top: 0.5rem;
+            border-top: 1px solid var(--border);
+            margin-top: 0.5rem;
+        }
+        .order-footer {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+        }
+        .images-preview {
+            display: flex;
+            gap: 0.5rem;
+            flex-wrap: wrap;
+            margin-bottom: 1rem;
+        }
+        .image-preview-item {
+            position: relative;
+            width: 80px;
+            height: 80px;
+        }
+        .image-preview-item img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 1px solid var(--border);
+        }
+        .image-preview-item .remove-btn {
+            position: absolute;
+            top: -8px;
+            right: -8px;
+            width: 24px;
+            height: 24px;
+            border-radius: 50%;
+            background: var(--error);
+            color: #fff;
+            border: none;
+            cursor: pointer;
+            font-size: 14px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        @media (max-width: 768px) {
+            .container {
+                padding: 1rem;
+            }
+            .form-row, .form-row-3 {
+                grid-template-columns: 1fr;
+            }
+            .top-bar {
+                padding: 1rem;
+            }
+            .top-bar h1 {
+                font-size: 1rem;
+            }
+            th, td {
+                padding: 0.75rem 0.5rem;
+                font-size: 0.85rem;
+            }
+        }
+    </style>
+</head>
+<body>
+
+<!-- Login Section -->
+<div class="login-container" id="loginSection">
+    <div class="login-box">
+        <h1>Admin Panel</h1>
+        <p>FETiH SAAT yonetim paneline giris yapin</p>
+        <div id="loginMessage"></div>
+        <div>
+            <label>Admin Sifresi</label>
+            <input type="password" id="adminKey" placeholder="Sifrenizi girin" onkeypress="if(event.key==='Enter') login()">
+        </div>
+        <button class="btn-primary" style="width: 100%;" onclick="login()">GIRIS YAP</button>
+    </div>
+</div>
+
+<!-- Admin Panel -->
+<div class="admin-panel" id="adminPanel">
+    <div class="top-bar">
+        <h1>FETiH SAAT - Admin Panel</h1>
+        <button class="btn-secondary btn-sm" onclick="logout()">CIKIS</button>
+    </div>
+
+    <div class="container">
+        <!-- Stats -->
+        <div class="stats-grid" id="statsGrid">
+            <div class="stat-card">
+                <div class="value" id="totalProducts">0</div>
+                <div class="label">Toplam Urun</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="totalCategories">0</div>
+                <div class="label">Kategori</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="totalOrders">0</div>
+                <div class="label">Toplam Siparis</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="paidOrders">0</div>
+                <div class="label">Odenen Siparis</div>
+            </div>
+            <div class="stat-card">
+                <div class="value" id="totalRevenue">0 TL</div>
+                <div class="label">Toplam Gelir</div>
+            </div>
+        </div>
+
+        <!-- Tabs -->
+        <div class="tabs">
+            <button class="tab active" onclick="switchTab('products')">Urunler</button>
+            <button class="tab" onclick="switchTab('categories')">Kategoriler</button>
+            <button class="tab" onclick="switchTab('coupons')">Kuponlar</button>
+            <button class="tab" onclick="switchTab('orders')">Siparisler</button>
+            <button class="tab" onclick="switchTab('settings')">Ayarlar</button>
+        </div>
+
+        <!-- Products Tab -->
+        <div id="productsTab" class="tab-content active">
+            <div class="section">
+                <h2>Yeni Urun Ekle</h2>
+                <div id="productMessage"></div>
+                <div class="form-row">
+                    <div>
+                        <label>Urun Adi *</label>
+                        <input type="text" id="productName" placeholder="Fetih Imperial Gold">
+                    </div>
+                    <div>
+                        <label>Fiyat (TL) *</label>
+                        <input type="number" id="productPrice" placeholder="4500">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Kategori *</label>
+                        <select id="productCategory"></select>
+                    </div>
+                    <div>
+                        <label>Stok Durumu</label>
+                        <select id="productStock">
+                            <option value="true">Stokta</option>
+                            <option value="false">Tukendi</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label>Urun Gorselleri (URL - Her satira bir URL)</label>
+                    <textarea id="productImages" rows="3" placeholder="https://example.com/image1.png&#10;https://example.com/image2.png"></textarea>
+                </div>
+                <div id="productImagesPreview" class="images-preview"></div>
+                <div>
+                    <label>Aciklama</label>
+                    <textarea id="productDesc" rows="3" placeholder="Urun aciklamasi..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="addProduct()">URUN EKLE</button>
+            </div>
+
+            <div class="section">
+                <h2>Urun Listesi</h2>
+                <div id="productsList" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Categories Tab -->
+        <div id="categoriesTab" class="tab-content">
+            <div class="section">
+                <h2>Yeni Kategori Ekle</h2>
+                <div id="categoryMessage"></div>
+                <div class="form-row">
+                    <div>
+                        <label>Kategori Adi *</label>
+                        <input type="text" id="categoryName" placeholder="Luks Koleksiyon">
+                    </div>
+                    <div>
+                        <label>Kategori ID *</label>
+                        <input type="text" id="categoryId" placeholder="CAT-LUX">
+                    </div>
+                </div>
+                <div class="form-row">
+                    <div>
+                        <label>Gorsel URL</label>
+                        <input type="text" id="categoryImage" placeholder="https://example.com/category.png">
+                    </div>
+                    <div>
+                        <label>Siralama</label>
+                        <input type="number" id="categoryOrder" placeholder="1" value="0">
+                    </div>
+                </div>
+                <div>
+                    <label>Aciklama</label>
+                    <textarea id="categoryDesc" rows="2" placeholder="Kategori aciklamasi..."></textarea>
+                </div>
+                <button class="btn-primary" onclick="addCategory()">KATEGORI EKLE</button>
+            </div>
+
+            <div class="section">
+                <h2>Kategori Listesi</h2>
+                <div id="categoriesList" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Coupons Tab -->
+        <div id="couponsTab" class="tab-content">
+            <div class="section">
+                <h2>Yeni Kupon Ekle</h2>
+                <div id="couponMessage"></div>
+                <div class="form-row">
+                    <div>
+                        <label>Kupon Kodu *</label>
+                        <input type="text" id="couponCode" placeholder="INDIRIM10">
+                    </div>
+                    <div>
+                        <label>Indirim Tipi *</label>
+                        <select id="couponType">
+                            <option value="percent">Yuzde Indirim (%)</option>
+                            <option value="fixed">Sabit Tutar (TL)</option>
+                        </select>
+                    </div>
+                </div>
+                <div>
+                    <label>Deger *</label>
+                    <input type="number" id="couponValue" placeholder="10">
+                </div>
+                <button class="btn-primary" onclick="addCoupon()">KUPON EKLE</button>
+            </div>
+
+            <div class="section">
+                <h2>Kupon Listesi</h2>
+                <div id="couponsList" class="grid"></div>
+            </div>
+        </div>
+
+        <!-- Orders Tab -->
+        <div id="ordersTab" class="tab-content">
+            <div class="section">
+                <h2>Siparis Listesi</h2>
+                <div style="margin-bottom: 1rem;">
+                    <button class="btn-secondary btn-sm" onclick="loadOrders()">YENILE</button>
+                </div>
+                <div id="ordersList"></div>
+            </div>
+        </div>
+
+        <!-- Settings Tab -->
+        <div id="settingsTab" class="tab-content">
+            <div class="section">
+                <h2>Kargo Ayarlari</h2>
+                <div id="settingsMessage"></div>
+                <div>
+                    <label>Kargo Ucreti (TL)</label>
+                    <input type="number" id="settingShipping" placeholder="50">
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>EFT/Havale Bilgileri</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Banka Adi</label>
+                        <input type="text" id="settingEftBank" placeholder="Ziraat Bankasi">
+                    </div>
+                    <div>
+                        <label>Hesap Sahibi</label>
+                        <input type="text" id="settingEftName" placeholder="FETiH SAAT">
+                    </div>
+                </div>
+                <div>
+                    <label>IBAN</label>
+                    <input type="text" id="settingEftIban" placeholder="TR00 0000 0000 0000 0000 0000 00">
+                </div>
+            </div>
+
+            <div class="section">
+                <h2>Iletisim Bilgileri</h2>
+                <div class="form-row">
+                    <div>
+                        <label>Telefon</label>
+                        <input type="text" id="settingPhone" placeholder="+90 552 645 95 40">
+                    </div>
+                    <div>
+                        <label>E-posta</label>
+                        <input type="email" id="settingEmail" placeholder="info@fetihsaat.com">
+                    </div>
+                </div>
+                <div>
+                    <label>WhatsApp Numarasi (ulke kodu ile)</label>
+                    <input type="text" id="settingWhatsapp" placeholder="905526459540">
+                </div>
+                <button class="btn-primary" onclick="saveSettings()">AYARLARI KAYDET</button>
+            </div>
+
+            <div class="section">
+                <h2>API Baglantisi</h2>
+                <div id="connectionMessage"></div>
+                <div>
+                    <label>API URL</label>
+                    <input type="text" id="apiUrl" value="https://bio-1-mq9x.onrender.com" placeholder="Render API URL">
+                </div>
+                <button class="btn-secondary" onclick="testConnection()">BAGLANTIYI TEST ET</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+let API_URL = 'https://bio-1-mq9x.onrender.com';
+let ADMIN_KEY = '';
+let categories = [];
+
+// ==================== LOGIN ====================
+async function login() {
+    const key = document.getElementById('adminKey').value;
+    if (!key) {
+        showMessage('loginMessage', 'Lutfen sifre girin', 'error');
+        return;
+    }
+
+    showMessage('loginMessage', 'Dogrulaniyor...', 'info');
+
+    try {
+        const response = await fetch(`${API_URL}/admin/products`, {
+            headers: { 'X-ADMIN-KEY': key }
+        });
+
+        if (response.status === 403) {
+            showMessage('loginMessage', 'Yanlis sifre! Lutfen dogru sifreyi girin.', 'error');
+            return;
+        }
+
+        if (!response.ok) {
+            showMessage('loginMessage', 'Baglanti hatasi. Lutfen tekrar deneyin.', 'error');
+            return;
+        }
+
+        ADMIN_KEY = key;
+        localStorage.setItem('FETIH_ADMIN_KEY', key);
+        document.getElementById('loginSection').style.display = 'none';
+        document.getElementById('adminPanel').classList.add('active');
+        loadAllData();
+    } catch (error) {
+        showMessage('loginMessage', 'Baglanti hatasi: ' + error.message, 'error');
+    }
+}
+
+function logout() {
+    localStorage.removeItem('FETIH_ADMIN_KEY');
+    ADMIN_KEY = '';
+    document.getElementById('loginSection').style.display = 'flex';
+    document.getElementById('adminPanel').classList.remove('active');
+}
+
+function switchTab(tab) {
+    document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+    document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
+    
+    event.target.classList.add('active');
+    document.getElementById(tab + 'Tab').classList.add('active');
+
+    if (tab === 'products') loadProducts();
+    if (tab === 'categories') loadCategories();
+    if (tab === 'coupons') loadCoupons();
+    if (tab === 'orders') loadOrders();
+    if (tab === 'settings') loadSettings();
+}
+
+async function testConnection() {
+    API_URL = document.getElementById('apiUrl').value;
+    showMessage('connectionMessage', 'Baglanti test ediliyor...', 'info');
+    
+    try {
+        const response = await fetch(API_URL);
+        const data = await response.json();
+        showMessage('connectionMessage', 'Baglanti basarili! API durumu: ' + data.status + ' - Firebase: ' + (data.firebase || 'unknown'), 'success');
+    } catch (error) {
+        showMessage('connectionMessage', 'Baglanti hatasi: ' + error.message, 'error');
+    }
+}
+
+async function loadAllData() {
+    await Promise.all([loadProducts(), loadCategories(), loadCoupons(), loadOrders(), loadStats(), loadSettings()]);
+}
+
+async function loadStats() {
+    try {
+        const [productsRes, ordersRes, categoriesRes] = await Promise.all([
+            fetch(`${API_URL}/admin/products`, { headers: { 'X-ADMIN-KEY': ADMIN_KEY } }),
+            fetch(`${API_URL}/admin/orders`, { headers: { 'X-ADMIN-KEY': ADMIN_KEY } }),
+            fetch(`${API_URL}/admin/categories`, { headers: { 'X-ADMIN-KEY': ADMIN_KEY } })
+        ]);
+
+        const productsData = await productsRes.json();
+        const ordersData = await ordersRes.json();
+        const categoriesData = await categoriesRes.json();
+
+        const products = productsData.products || [];
+        const orders = ordersData.orders || [];
+        categories = categoriesData.categories || [];
+
+        document.getElementById('totalProducts').textContent = products.length;
+        document.getElementById('totalCategories').textContent = categories.length;
+        document.getElementById('totalOrders').textContent = orders.length;
+        
+        const paidOrders = orders.filter(o => o.status === 'PAID');
+        document.getElementById('paidOrders').textContent = paidOrders.length;
+        
+        const revenue = paidOrders.reduce((sum, o) => sum + (o.totalTRY || 0), 0);
+        document.getElementById('totalRevenue').textContent = formatPrice(revenue) + ' TL';
+
+        updateCategorySelect();
+    } catch (error) {
+        console.error('Stats yuklenemedi:', error);
+    }
+}
+
+function updateCategorySelect() {
+    const select = document.getElementById('productCategory');
+    if (categories.length === 0) {
+        select.innerHTML = '<option value="">Kategori yok - Önce kategori ekleyin</option>';
+    } else {
+        select.innerHTML = categories.map(c => `<option value="${c.id}">${c.name}</option>`).join('');
+    }
+}
+
+// ==================== CATEGORIES ====================
+async function loadCategories() {
+    const list = document.getElementById('categoriesList');
+    list.innerHTML = '<div class="empty-state"><p>Yukleniyor...</p></div>';
+
+    try {
+        const response = await fetch(`${API_URL}/admin/categories`, {
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+        
+        if (response.status === 403) {
+            list.innerHTML = '<div class="empty-state"><p>Yetkisiz erisim - Lutfen tekrar giris yapin</p></div>';
+            return;
+        }
+        
+        const data = await response.json();
+        categories = data.categories || [];
+        
+        if (categories.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <p>Henuz kategori eklenmemis</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = categories.map(c => `
+            <div class="card">
+                ${c.image ? `<img class="card-image" src="${c.image}" alt="${c.name}">` : ''}
+                <h3>${c.name}</h3>
+                <p>${c.description || 'Aciklama yok'}</p>
+                <p>Siralama: ${c.order || 0}</p>
+                <span class="card-id">ID: ${c.id}</span>
+                <div class="actions">
+                    <button class="btn-danger btn-sm" onclick="deleteCategory('${c.id}')">Sil</button>
+                </div>
+            </div>
+        `).join('');
+
+        updateCategorySelect();
+    } catch (error) {
+        list.innerHTML = `<div class="empty-state"><p>Hata: ${error.message}</p></div>`;
+    }
+}
+
+async function addCategory() {
+    const category = {
+        id: document.getElementById('categoryId').value.trim(),
+        name: document.getElementById('categoryName').value.trim(),
+        image: document.getElementById('categoryImage').value.trim(),
+        description: document.getElementById('categoryDesc').value.trim(),
+        order: parseInt(document.getElementById('categoryOrder').value) || 0
+    };
+
+    if (!category.id || !category.name) {
+        showMessage('categoryMessage', 'Lutfen zorunlu alanlari doldurun', 'error');
+        return;
+    }
+
+    showMessage('categoryMessage', 'Kategori ekleniyor...', 'info');
+
+    try {
+        const response = await fetch(`${API_URL}/admin/categories`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-ADMIN-KEY': ADMIN_KEY
+            },
+            body: JSON.stringify(category)
+        });
+
+        if (response.status === 403) {
+            showMessage('categoryMessage', 'Yetkisiz erisim - Admin anahtari hatali', 'error');
+            return;
+        }
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            showMessage('categoryMessage', 'Kategori basariyla eklendi!', 'success');
+            document.getElementById('categoryId').value = '';
+            document.getElementById('categoryName').value = '';
+            document.getElementById('categoryImage').value = '';
+            document.getElementById('categoryDesc').value = '';
+            document.getElementById('categoryOrder').value = '0';
+            loadCategories();
+            loadStats();
+        } else {
+            throw new Error(data.error || 'Kategori eklenemedi');
+        }
+    } catch (error) {
+        showMessage('categoryMessage', 'Hata: ' + error.message, 'error');
+    }
+}
+
+async function deleteCategory(id) {
+    if (!confirm('Bu kategoriyi silmek istediginizden emin misiniz?')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/admin/categories/${id}`, {
+            method: 'DELETE',
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+
+        if (response.ok) {
+            loadCategories();
+            loadStats();
+        } else {
+            throw new Error('Kategori silinemedi');
+        }
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ==================== PRODUCTS ====================
+async function addProduct() {
+    const imagesText = document.getElementById('productImages').value.trim();
+    const images = imagesText.split('\n').filter(url => url.trim());
+
+    const product = {
+        name: document.getElementById('productName').value.trim(),
+        priceTRY: parseFloat(document.getElementById('productPrice').value),
+        categoryId: document.getElementById('productCategory').value,
+        images: images,
+        imageUrl: images[0] || '',
+        description: document.getElementById('productDesc').value.trim(),
+        active: document.getElementById('productStock').value === 'true'
+    };
+
+    if (!product.name || !product.priceTRY) {
+        showMessage('productMessage', 'Lutfen zorunlu alanlari doldurun', 'error');
+        return;
+    }
+
+    if (!product.categoryId) {
+        showMessage('productMessage', 'Lutfen bir kategori secin. Önce kategori eklemeniz gerekiyor.', 'error');
+        return;
+    }
+
+    showMessage('productMessage', 'Urun ekleniyor...', 'info');
+
+    try {
+        const response = await fetch(`${API_URL}/admin/products`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-ADMIN-KEY': ADMIN_KEY
+            },
+            body: JSON.stringify(product)
+        });
+
+        if (response.status === 403) {
+            showMessage('productMessage', 'Yetkisiz erisim - Admin anahtari hatali', 'error');
+            return;
+        }
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            showMessage('productMessage', 'Urun basariyla eklendi!', 'success');
+            document.getElementById('productName').value = '';
+            document.getElementById('productPrice').value = '';
+            document.getElementById('productImages').value = '';
+            document.getElementById('productDesc').value = '';
+            document.getElementById('productImagesPreview').innerHTML = '';
+            loadProducts();
+            loadStats();
+        } else {
+            throw new Error(data.error || 'Urun eklenemedi');
+        }
+    } catch (error) {
+        showMessage('productMessage', 'Hata: ' + error.message, 'error');
+    }
+}
+
+async function loadProducts() {
+    const list = document.getElementById('productsList');
+    list.innerHTML = '<div class="empty-state"><p>Yukleniyor...</p></div>';
+
+    try {
+        const response = await fetch(`${API_URL}/admin/products`, {
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+        
+        if (response.status === 403) {
+            list.innerHTML = '<div class="empty-state"><p>Yetkisiz erisim - Lutfen tekrar giris yapin</p></div>';
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (!data.products || data.products.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <p>Henuz urun eklenmemis</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = data.products.map(p => {
+            const category = categories.find(c => c.id === p.categoryId);
+            const imageUrl = p.images?.[0] || p.imageUrl || '';
+            return `
+                <div class="card">
+                    ${imageUrl ? `<img class="card-image" src="${imageUrl}" alt="${p.name}">` : ''}
+                    <h3>${p.name}</h3>
+                    <p class="price">${formatPrice(p.priceTRY)} TL</p>
+                    <p>Kategori: ${category?.name || 'Belirsiz'}</p>
+                    <p>Durum: <span class="status ${p.active ? 'paid' : 'failed'}">${p.active !== false ? 'Aktif' : 'Pasif'}</span></p>
+                    ${p.images?.length > 1 ? `<p>${p.images.length} gorsel</p>` : ''}
+                    <span class="card-id">ID: ${p.id}</span>
+                    <div class="actions">
+                        <button class="btn-danger btn-sm" onclick="deleteProduct('${p.id}')">Sil</button>
+                        <button class="btn-secondary btn-sm" onclick="toggleProduct('${p.id}', ${!(p.active !== false)})">
+                            ${p.active !== false ? 'Pasif' : 'Aktif'}
+                        </button>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        list.innerHTML = `<div class="empty-state"><p>Hata: ${error.message}</p></div>`;
+    }
+}
+
+async function deleteProduct(id) {
+    if (!confirm('Bu urunu silmek istediginizden emin misiniz?')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/admin/products/${id}`, {
+            method: 'DELETE',
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+
+        if (response.ok) {
+            loadProducts();
+            loadStats();
+        } else {
+            throw new Error('Urun silinemedi');
+        }
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+async function toggleProduct(id, active) {
+    try {
+        const response = await fetch(`${API_URL}/admin/products/${id}`, {
+            method: 'PUT',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-ADMIN-KEY': ADMIN_KEY
+            },
+            body: JSON.stringify({ active })
+        });
+
+        if (response.ok) {
+            loadProducts();
+        } else {
+            throw new Error('Durum guncellenemedi');
+        }
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ==================== COUPONS ====================
+async function addCoupon() {
+    const coupon = {
+        code: document.getElementById('couponCode').value.toUpperCase().trim(),
+        type: document.getElementById('couponType').value,
+        value: parseFloat(document.getElementById('couponValue').value),
+        active: true
+    };
+
+    if (!coupon.code || !coupon.value) {
+        showMessage('couponMessage', 'Lutfen zorunlu alanlari doldurun', 'error');
+        return;
+    }
+
+    showMessage('couponMessage', 'Kupon ekleniyor...', 'info');
+
+    try {
+        const response = await fetch(`${API_URL}/admin/coupons`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-ADMIN-KEY': ADMIN_KEY
+            },
+            body: JSON.stringify(coupon)
+        });
+
+        if (response.status === 403) {
+            showMessage('couponMessage', 'Yetkisiz erisim - Admin anahtari hatali', 'error');
+            return;
+        }
+
+        const data = await response.json();
+        
+        if (response.ok && data.success) {
+            showMessage('couponMessage', 'Kupon basariyla eklendi!', 'success');
+            document.getElementById('couponCode').value = '';
+            document.getElementById('couponValue').value = '';
+            loadCoupons();
+        } else {
+            throw new Error(data.error || 'Kupon eklenemedi');
+        }
+    } catch (error) {
+        showMessage('couponMessage', 'Hata: ' + error.message, 'error');
+    }
+}
+
+async function loadCoupons() {
+    const list = document.getElementById('couponsList');
+    list.innerHTML = '<div class="empty-state"><p>Yukleniyor...</p></div>';
+
+    try {
+        const response = await fetch(`${API_URL}/admin/coupons`, {
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+        
+        if (response.status === 403) {
+            list.innerHTML = '<div class="empty-state"><p>Yetkisiz erisim</p></div>';
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (!data.coupons || data.coupons.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <p>Henuz kupon eklenmemis</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = data.coupons.map(c => `
+            <div class="card">
+                <h3>${c.code}</h3>
+                <p class="price">${c.type === 'percent' ? '%' + c.value : c.value + ' TL'}</p>
+                <p>${c.type === 'percent' ? 'Yuzde Indirim' : 'Sabit Tutar Indirim'}</p>
+                <div class="actions">
+                    <button class="btn-danger btn-sm" onclick="deleteCoupon('${c.code}')">Sil</button>
+                </div>
+            </div>
+        `).join('');
+    } catch (error) {
+        list.innerHTML = `<div class="empty-state"><p>Hata: ${error.message}</p></div>`;
+    }
+}
+
+async function deleteCoupon(code) {
+    if (!confirm('Bu kuponu silmek istediginizden emin misiniz?')) return;
+
+    try {
+        const response = await fetch(`${API_URL}/admin/coupons/${code}`, {
+            method: 'DELETE',
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+
+        if (response.ok) {
+            loadCoupons();
+        } else {
+            throw new Error('Kupon silinemedi');
+        }
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ==================== ORDERS ====================
+async function loadOrders() {
+    const list = document.getElementById('ordersList');
+    list.innerHTML = '<div class="empty-state"><p>Yukleniyor...</p></div>';
+
+    try {
+        const response = await fetch(`${API_URL}/admin/orders`, {
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+        
+        if (response.status === 403) {
+            list.innerHTML = '<div class="empty-state"><p>Yetkisiz erisim</p></div>';
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (!data.orders || data.orders.length === 0) {
+            list.innerHTML = `
+                <div class="empty-state">
+                    <p>Henuz siparis yok</p>
+                </div>
+            `;
+            return;
+        }
+
+        list.innerHTML = data.orders.map(o => {
+            const date = new Date(o.createdAt);
+            const formattedDate = date.toLocaleDateString('tr-TR', {
+                year: 'numeric',
+                month: '2-digit',
+                day: '2-digit',
+                hour: '2-digit',
+                minute: '2-digit',
+                second: '2-digit'
+            });
+
+            const subtotal = o.subtotalTRY || ((o.totalTRY || 0) - (o.shippingTRY || 0) + (o.discountTRY || 0));
+
+            return `
+                <div class="order-card">
+                    <div class="order-header">
+                        <div>
+                            <span class="order-id">${o.id}</span>
+                            <span class="status ${o.status?.toLowerCase().replace('_', '')}">${o.status}</span>
+                            ${o.paymentMethod ? `<span class="status info">${o.paymentMethod}</span>` : ''}
+                        </div>
+                        <div class="order-date">${formattedDate}</div>
+                    </div>
+                    <div class="order-body">
+                        <div class="order-customer">
+                            <h4>Musteri Bilgileri</h4>
+                            <div class="customer-info">
+                                <div class="customer-info-item"><strong>Ad Soyad:</strong> ${o.customer?.name || o.customer?.firstName + ' ' + o.customer?.lastName || 'N/A'}</div>
+                                <div class="customer-info-item"><strong>E-posta:</strong> ${o.customer?.email || 'N/A'}</div>
+                                <div class="customer-info-item"><strong>Telefon:</strong> ${o.customer?.phone || 'N/A'}</div>
+                                <div class="customer-info-item"><strong>Adres:</strong> ${o.customer?.address || 'N/A'}</div>
+                                <div class="customer-info-item"><strong>Il/Ilce:</strong> ${o.customer?.city || ''} / ${o.customer?.district || ''}</div>
+                                <div class="customer-info-item"><strong>Posta Kodu:</strong> ${o.customer?.postalCode || 'N/A'}</div>
+                            </div>
+                        </div>
+                        
+                        <div class="order-items">
+                            <h4>Siparis Icerigi</h4>
+                            ${(o.items || []).map(item => `
+                                <div class="order-item">
+                                    <span>${item.name || item.productId} x ${item.qty}</span>
+                                    <span>${formatPrice(item.price)} TL x ${item.qty} = ${formatPrice(item.lineTotal || item.price * item.qty)} TL</span>
+                                </div>
+                            `).join('')}
+                        </div>
+
+                        <div class="order-summary">
+                            <div class="order-summary-row">
+                                <span>Ara Toplam</span>
+                                <span>${formatPrice(subtotal)} TL</span>
+                            </div>
+                            ${o.discountTRY > 0 ? `
+                                <div class="order-summary-row" style="color: var(--success);">
+                                    <span>Indirim ${o.couponCode ? '(' + o.couponCode + ')' : ''}</span>
+                                    <span>-${formatPrice(o.discountTRY)} TL</span>
+                                </div>
+                            ` : ''}
+                            <div class="order-summary-row">
+                                <span>Kargo</span>
+                                <span>${formatPrice(o.shippingTRY || 0)} TL</span>
+                            </div>
+                            <div class="order-summary-row total">
+                                <span>Toplam</span>
+                                <span>${formatPrice(o.totalTRY || 0)} TL</span>
+                            </div>
+                        </div>
+
+                        <div class="order-footer">
+                            <select onchange="updateOrderStatus('${o.id}', this.value)" style="padding: 0.5rem; font-size: 0.85rem; border-radius: 8px; border: 1px solid var(--border);">
+                                <option value="">Durum Degistir</option>
+                                <option value="PENDING" ${o.status === 'PENDING' ? 'selected' : ''}>PENDING</option>
+                                <option value="EFT_PENDING" ${o.status === 'EFT_PENDING' ? 'selected' : ''}>EFT BEKLIYOR</option>
+                                <option value="PAYMENT_STARTED" ${o.status === 'PAYMENT_STARTED' ? 'selected' : ''}>ODEME BASLADI</option>
+                                <option value="PAID" ${o.status === 'PAID' ? 'selected' : ''}>ODENDI</option>
+                                <option value="SHIPPED" ${o.status === 'SHIPPED' ? 'selected' : ''}>KARGOYA VERILDI</option>
+                                <option value="FAILED" ${o.status === 'FAILED' ? 'selected' : ''}>IPTAL</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+            `;
+        }).join('');
+    } catch (error) {
+        list.innerHTML = `<div class="empty-state"><p>Hata: ${error.message}</p></div>`;
+    }
+}
+
+async function updateOrderStatus(orderId, status) {
+    if (!status) return;
+
+    try {
+        const response = await fetch(`${API_URL}/admin/orders/${orderId}/status`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-ADMIN-KEY': ADMIN_KEY
+            },
+            body: JSON.stringify({ status })
+        });
+
+        if (response.ok) {
+            loadOrders();
+            loadStats();
+        } else {
+            throw new Error('Durum guncellenemedi');
+        }
+    } catch (error) {
+        alert('Hata: ' + error.message);
+    }
+}
+
+// ==================== SETTINGS ====================
+async function loadSettings() {
+    try {
+        const response = await fetch(`${API_URL}/admin/settings`, {
+            headers: { 'X-ADMIN-KEY': ADMIN_KEY }
+        });
+        
+        if (response.status === 403) {
+            showMessage('settingsMessage', 'Yetkisiz erisim', 'error');
+            return;
+        }
+        
+        const data = await response.json();
+        
+        if (data.settings) {
+            document.getElementById('settingShipping').value = data.settings.shippingCost || 50;
+            document.getElementById('settingEftBank').value = data.settings.eftBank || '';
+            document.getElementById('settingEftName').value = data.settings.eftName || '';
+            document.getElementById('settingEftIban').value = data.settings.eftIban || '';
+            document.getElementById('settingPhone').value = data.settings.phone || '';
+            document.getElementById('settingEmail').value = data.settings.email || '';
+            document.getElementById('settingWhatsapp').value = data.settings.whatsapp || '';
+        }
+    } catch (error) {
+        console.error('Ayarlar yuklenemedi:', error);
+    }
+}
+
+async function saveSettings() {
+    const settings = {
+        shippingCost: parseFloat(document.getElementById('settingShipping').value) || 50,
+        eftBank: document.getElementById('settingEftBank').value.trim(),
+        eftName: document.getElementById('settingEftName').value.trim(),
+        eftIban: document.getElementById('settingEftIban').value.trim(),
+        phone: document.getElementById('settingPhone').value.trim(),
+        email: document.getElementById('settingEmail').value.trim(),
+        whatsapp: document.getElementById('settingWhatsapp').value.trim()
+    };
+
+    showMessage('settingsMessage', 'Kaydediliyor...', 'info');
+
+    try {
+        const response = await fetch(`${API_URL}/admin/settings`, {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-ADMIN-KEY': ADMIN_KEY
+            },
+            body: JSON.stringify(settings)
+        });
+
+        if (response.status === 403) {
+            showMessage('settingsMessage', 'Yetkisiz erisim - Admin anahtari hatali', 'error');
+            return;
+        }
+
+        if (response.ok) {
+            showMessage('settingsMessage', 'Ayarlar basariyla kaydedildi!', 'success');
+        } else {
+            throw new Error('Ayarlar kaydedilemedi');
+        }
+    } catch (error) {
+        showMessage('settingsMessage', 'Hata: ' + error.message, 'error');
+    }
+}
+
+// ==================== HELPERS ====================
+function showMessage(elementId, message, type) {
+    const el = document.getElementById(elementId);
+    if (!message) {
+        el.innerHTML = '';
+        return;
+    }
+    el.innerHTML = `<div class="message ${type}">${message}</div>`;
+}
+
+function formatPrice(price) {
+    return new Intl.NumberFormat('tr-TR', { minimumFractionDigits: 0 }).format(price || 0);
+}
+
+// Preview images
+document.getElementById('productImages')?.addEventListener('input', function() {
+    const urls = this.value.split('\n').filter(url => url.trim());
+    const preview = document.getElementById('productImagesPreview');
+    preview.innerHTML = urls.map((url, i) => `
+        <div class="image-preview-item">
+            <img src="${url.trim()}" alt="Preview ${i+1}" onerror="this.style.display='none'">
+        </div>
+    `).join('');
+});
+
+// Auto login check
+window.onload = function() {
+    const savedKey = localStorage.getItem('FETIH_ADMIN_KEY');
+    if (savedKey) {
+        document.getElementById('adminKey').value = savedKey;
+        // Otomatik giris dene
+        login();
+    }
+};
+</script>
+
+</body>
+</html>
