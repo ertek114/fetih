@@ -301,6 +301,24 @@
             color: rgba(255,255,255,0.4);
             margin-left: 0.5rem;
         }
+        .footer-payments {
+            margin-top: 16px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 16px;
+        }
+        
+        .footer-payments img {
+            height: 32px;      /* logolar dengeli dursun */
+            width: auto;
+            opacity: 0.9;
+            transition: opacity 0.2s ease;
+        }
+        
+        .footer-payments img:hover {
+            opacity: 1;
+        }
 
         /* SEARCH PAGE */
         .search-page {
@@ -652,6 +670,9 @@
                 padding: calc(var(--header-height) + 40px) var(--sides) 40px;
                 max-width: 1400px;
                 margin: 0 auto;
+            }
+            .footer-payments img {
+                height: 22px;   /* mobilde daha küçük */
             }
 
             .hero-carousel {
@@ -1118,6 +1139,10 @@
                 padding: 48px 0;
                 border-top: none;
                 grid-column: 1 / -1;
+            }
+            .footer-payments img {
+                    height: 22px;   /* mobilde daha küçük */
+                }
             }
 
             .related-products .product-grid {
